@@ -11,7 +11,6 @@ library(shiny)
 library(shinydashboard)
 library(ggplot2)
 library(lubridate)
-library(DT)
 library(jpeg)
 library(grid)
 library(leaflet)
@@ -25,7 +24,9 @@ library(stringr)
 library(plyr)
 library(dplyr)
 library(DT)
+# library(measurements)
 require(scales)
+
 options(scipen=10000)
 
 temp = list.files(pattern="*_1.csv")
@@ -49,6 +50,14 @@ allData3$weekday <- weekdays(allData3$lubridateDate)
 
 allData3$lubridateDateOnly <- as.Date(mdy_hms(allData3$'Trip.Start.Timestamp'))
 
+
+milesBreak <- c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)
+kmBreak <- round(1.60934*milesBreak,3)
+#kmBreak <- round(conv_unit(milesBreak, "mi", "km"),3)
+
+
+
+
 daycount <- allData3 %>% group_by(lubridateDateOnly) %>%summarise(count = n())
 hourcount <- allData3 %>% group_by(hour) %>%summarise(count = n())
 hourcount$hour <- factor(hourcount$hour, labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
@@ -57,8 +66,13 @@ weekdaycount$weekday <- factor(weekdaycount$weekday, levels = c("Monday", "Tuesd
 monthcount <- allData3 %>% group_by(month) %>%summarise(count = n())
 monthcount$month <- factor(monthcount$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
 mileagecount <- allData3 %>% group_by(Trip.Miles) %>%summarise(count = n())
+# mileagecount$km <- round(conv_unit(mileagecount$Trip.Miles, "mi", "km"),3)
+mileagecount$km <- round(1.60934*mileagecount$Trip.Miles,3)
 mileagecount <- mileagecount %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
-mileagebincount <- mileagecount %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
+mileagecountFinal <- mileagecount %>% mutate(km_bin = cut(km, breaks=kmBreak))
+mileagecountkmbin <- mileagecountFinal %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
+mileagecountmilesbin <- mileagecountFinal %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
+
 triptimecount <- allData3 %>% group_by(Trip.Seconds) %>%summarise(count = n())
 triptimecount1 <- triptimecount %>% mutate(trip_time_bin = cut(Trip.Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000)))
 triptimecount1bin <- triptimecount1 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
@@ -94,6 +108,9 @@ ui <- dashboardPage(
     selectInput("chart1", h3("Bar/Table Theme"), 
                 choices = list("Barchart" = 1,
                                "Table" = 2), selected = 1),
+    selectInput("miles_km", h3("miles/km"), 
+                choices = list("miles" = 1,
+                               "km" = 2), selected = 1),
     hr(),
     selectInput("page1", h3("Select the page"), pages, selected = "Home"),
     # hr(),
@@ -190,14 +207,22 @@ ui <- dashboardPage(
         ),
         column(2,
                fluidRow(
-                 box(title = "Rides in 2019 by binned mileage", solidHeader = TRUE, status = "primary", width = 12,
+                   box(title = "Rides in 2019 by binned distance unit", solidHeader = TRUE, status = "primary", width = 12,
                      conditionalPanel(
-                       condition = "input.chart1 == '1'",
+                       condition = "input.chart1 == '1' && input.miles_km == '1'",
                        plotOutput("hist5", height=600)
+                     ),
+                     conditionalPanel(
+                       condition = "input.chart1 == '1' && input.miles_km == '2'",
+                       plotOutput("histkm", height=600)
                      )
                      , conditionalPanel(
-                       condition = "input.chart1 == '2'",
+                       condition = "input.chart1 == '2' && input.miles_km == '1'",
                        DTOutput("tb5", height=600)
+                     )
+                     , conditionalPanel(
+                       condition = "input.chart1 == '2' && input.miles_km == '2'",
+                       DTOutput("tbkm", height=600)
                      )
                  )
                ),
@@ -257,9 +282,13 @@ server <- function(input, output) {
     })
 
     output$hist5 <- renderPlot({
-      ggplot(mileagebincount, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(mileagecountmilesbin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
     
+    output$histkm <- renderPlot({
+      ggplot(mileagecountkmbin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+    })
+
     output$hist6 <- renderPlot({
       ggplot(triptimecount1bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
@@ -302,10 +331,19 @@ server <- function(input, output) {
     
     output$tb5 = renderDT({
       dfbar4 <- data.frame(
-        miles = mileagebincount$mileage_bin,
-        rides = mileagebincount$Frequency
+        miles = mileagecountmilesbin$mileage_bin,
+        rides = mileagecountmilesbin$Frequency
       )
       dfbar4 <- dfbar4[order(dfbar4$miles),]
+      datatable(dfbar4,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+    })
+    
+    output$tbkm = renderDT({
+      dfbar4 <- data.frame(
+        km = mileagecountkmbin$km_bin,
+        rides = mileagecountkmbin$Frequency
+      )
+      dfbar4 <- dfbar4[order(dfbar4$km),]
       datatable(dfbar4,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
     })
     
@@ -317,6 +355,8 @@ server <- function(input, output) {
       dfbar5 <- dfbar5[order(dfbar5$time),]
       datatable(dfbar5,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
     })
+    
+    
 }
 
 # Run the application 
