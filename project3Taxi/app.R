@@ -24,8 +24,11 @@ library(stringr)
 library(plyr)
 library(dplyr)
 library(DT)
+library(sf)
+
 # library(measurements)
 require(scales)
+
 
 options(scipen=999)
 
@@ -35,6 +38,13 @@ allData3 <- do.call(rbind, allData2)
 temp2 = list.files(pattern="*Company_names.csv")
 allDataLL <- lapply(temp2, read.csv)
 allDataLL3 <- do.call(rbind, allDataLL)
+
+temp3 = list.files(pattern="*Areas.csv")
+allDataCA <- lapply(temp3, read.csv)
+commArea <- do.call(rbind, allDataCA)
+
+shfile <- st_read("CA/geo_export_2bbe4e78-a3d0-4e60-b4e3-8e1ceaa042d3.shp")
+downtown<-st_geometry(shfile)
 
 
 lubridateDate <- mdy_hms(allData3$'Trip.Start.Timestamp')
@@ -49,6 +59,8 @@ allData3$second <- second(lubridateDate)
 allData3$weekday <- weekdays(allData3$lubridateDate)
 
 allData3$lubridateDateOnly <- as.Date(mdy_hms(allData3$'Trip.Start.Timestamp'))
+
+
 
 
 milesBreak <- c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)
@@ -148,14 +160,7 @@ ui <- dashboardPage(
       fluidRow(
         column(6,
                fluidRow(
-                 column(6,
-                     # leafletOutput("mymap", height=700)
-                 ),
-                 column(6,
-                        # box(title = "Total CTA Entries for all stations", solidHeader = TRUE, status = "primary", width = 12,
-                        #     DTOutput("tbBarchart", height=600) 
-                        # )
-                 )
+                     leafletOutput("mymap", height=900)
                )
         ),
         column(2,
@@ -381,6 +386,14 @@ server <- function(input, output) {
       )
       dfbar5 <- dfbar5[order(dfbar5$time),]
       datatable(dfbar5,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+    })
+    
+    output$mymap <- renderLeaflet({
+      leaflet(downtown) %>%
+        addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,
+                    highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                        bringToFront = TRUE))
     })
     
     
