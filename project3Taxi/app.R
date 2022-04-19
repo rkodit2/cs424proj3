@@ -27,7 +27,7 @@ library(DT)
 # library(measurements)
 require(scales)
 
-options(scipen=10000)
+options(scipen=999)
 
 temp = list.files(pattern="*_1.csv")
 allData2 <- lapply(temp, read.csv)
@@ -76,7 +76,7 @@ mileagecountkmbin <- mileagecountFinal %>% group_by(km_bin) %>% summarise(Freque
 mileagecountmilesbin <- mileagecountFinal %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
 
 triptimecount <- allData3 %>% group_by(Trip.Seconds) %>%summarise(count = n())
-triptimecount1 <- triptimecount %>% mutate(trip_time_bin = cut(Trip.Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000)))
+triptimecount1 <- triptimecount %>% mutate(trip_time_bin = cut(Trip.Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
 triptimecount1bin <- triptimecount1 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
 
 pages <- c("Home","About Page")
