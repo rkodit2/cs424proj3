@@ -60,7 +60,9 @@ kmBreak <- round(1.60934*milesBreak,3)
 
 daycount <- allData3 %>% group_by(lubridateDateOnly) %>%summarise(count = n())
 hourcount <- allData3 %>% group_by(hour) %>%summarise(count = n())
-hourcount$hour <- factor(hourcount$hour, labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
+hourcount$hourAMPM <- factor(hourcount$hour, labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
+hourcount$hour <- factor(hourcount$hour, labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
+
 weekdaycount <- allData3 %>% group_by(weekday) %>%summarise(count = n())
 weekdaycount$weekday <- factor(weekdaycount$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
 monthcount <- allData3 %>% group_by(month) %>%summarise(count = n())
@@ -111,6 +113,9 @@ ui <- dashboardPage(
     selectInput("miles_km", h3("miles/km"), 
                 choices = list("miles" = 1,
                                "km" = 2), selected = 1),
+    selectInput("hourmode", h3("AM-PM/24hour mode"), 
+                choices = list("AM-PM" = 1,
+                               "24hour" = 2), selected = 1),
     hr(),
     selectInput("page1", h3("Select the page"), pages, selected = "Home"),
     # hr(),
@@ -169,12 +174,20 @@ ui <- dashboardPage(
                fluidRow(
                  box(title = "Rides in 2019 by hour of day", solidHeader = TRUE, status = "primary", width = 12,
                      conditionalPanel(
-                       condition = "input.chart1 == '1'",
+                       condition = "input.chart1 == '1' && input.hourmode == '1'",
                        plotOutput("hist2", height=600)
+                     ),
+                     conditionalPanel(
+                       condition = "input.chart1 == '1' && input.hourmode == '2'",
+                       plotOutput("hist2Military", height=600)
                      )
                      , conditionalPanel(
-                       condition = "input.chart1 == '2'",
+                       condition = "input.chart1 == '2' && input.hourmode == '1'",
                        DTOutput("tb2", height=600)
+                     )
+                     , conditionalPanel(
+                       condition = "input.chart1 == '2' && input.hourmode == '2'",
+                       DTOutput("tb2Military", height=600)
                      )
                ),
         ),
@@ -270,8 +283,13 @@ server <- function(input, output) {
     })
 
     output$hist2 <- renderPlot({
+      ggplot(hourcount, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+    })
+    
+    output$hist2Military <- renderPlot({
       ggplot(hourcount, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
+    
 
     output$hist3 <- renderPlot({
       ggplot(weekdaycount, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -303,6 +321,15 @@ server <- function(input, output) {
     })
     
     output$tb2 = renderDT({
+      dfbar1 <- data.frame(
+        hours = hourcount$hourAMPM,
+        rides = hourcount$count
+      )
+      dfbar1 <- dfbar1[order(dfbar1$hours),]
+      datatable(dfbar1,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+    })
+    
+    output$tb2Military = renderDT({
       dfbar1 <- data.frame(
         hours = hourcount$hour,
         rides = hourcount$count
