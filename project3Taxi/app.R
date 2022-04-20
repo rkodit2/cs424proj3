@@ -24,8 +24,12 @@ library(stringr)
 library(plyr)
 library(dplyr)
 library(DT)
+library(sf)
+library(rgdal)
+
 # library(measurements)
 require(scales)
+
 
 options(scipen=999)
 
@@ -35,6 +39,16 @@ allData3 <- do.call(rbind, allData2)
 temp2 = list.files(pattern="*Company_names.csv")
 allDataLL <- lapply(temp2, read.csv)
 allDataLL3 <- do.call(rbind, allDataLL)
+
+# temp3 = list.files(pattern="*Areas.csv")
+# allDataCA <- lapply(temp3, read.csv)
+# commArea <- do.call(rbind, allDataCA)
+
+# shfile <- st_read("CA/geo_export_2bbe4e78-a3d0-4e60-b4e3-8e1ceaa042d3.shp")
+# downtown<-st_geometry(shfile)
+
+downtown <- readOGR("CA/geo_export_2bbe4e78-a3d0-4e60-b4e3-8e1ceaa042d3.shp",
+                    layer = "geo_export_2bbe4e78-a3d0-4e60-b4e3-8e1ceaa042d3", GDAL1_integer64_policy = TRUE)
 
 
 lubridateDate <- mdy_hms(allData3$'Trip.Start.Timestamp')
@@ -49,6 +63,21 @@ allData3$second <- second(lubridateDate)
 allData3$weekday <- weekdays(allData3$lubridateDate)
 
 allData3$lubridateDateOnly <- as.Date(mdy_hms(allData3$'Trip.Start.Timestamp'))
+
+
+data1 <- read.csv("FinalCommAreas.csv")
+pickupCA <- allData3 %>% group_by(Pickup.Community.Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
+dropCA <- allData3 %>% group_by(Drop.off.community.Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
+pickupCAFinal <- merge(pickupCA,data1, by.x  = "Pickup.Community.Area", by.y="AREA_NUMBE")
+dropCAFinal <- merge(dropCA,data1, by.x  = "Drop.off.community.Area", by.y="AREA_NUMBE")
+
+
+downtownFinal1 <- merge(downtown,pickupCAFinal, by.x  = "area_numbe", by.y="Pickup.Community.Area")
+downtownFinal2 <- merge(downtown,dropCAFinal, by.x  = "area_numbe", by.y="Drop.off.community.Area") 
+
+
+
+
 
 
 milesBreak <- c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)
@@ -116,6 +145,9 @@ ui <- dashboardPage(
     selectInput("hourmode", h3("AM-PM/24hour mode"), 
                 choices = list("AM-PM" = 1,
                                "24hour" = 2), selected = 1),
+    selectInput("ca_mode", h3("PickUp(From)/DropOff(To)"), 
+                choices = list("PickUp(From)" = 1,
+                               "DropOff(To)" = 2), selected = 1),
     hr(),
     selectInput("page1", h3("Select the page"), pages, selected = "Home"),
     # hr(),
@@ -148,13 +180,14 @@ ui <- dashboardPage(
       fluidRow(
         column(6,
                fluidRow(
-                 column(6,
-                     # leafletOutput("mymap", height=700)
-                 ),
-                 column(6,
-                        # box(title = "Total CTA Entries for all stations", solidHeader = TRUE, status = "primary", width = 12,
-                        #     DTOutput("tbBarchart", height=600) 
-                        # )
+                     # leafletOutput("mymap", height=900)
+                 conditionalPanel(
+                   condition = "input.ca_mode == '1'",
+                   leafletOutput("mymapPickup", height=900)
+                 )
+                 , conditionalPanel(
+                   condition = "input.ca_mode == '2'",
+                   leafletOutput("mymapDropOff", height=900)
                  )
                )
         ),
@@ -381,6 +414,34 @@ server <- function(input, output) {
       )
       dfbar5 <- dfbar5[order(dfbar5$time),]
       datatable(dfbar5,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+    })
+    
+    # output$mymap <- renderLeaflet({
+    #   leaflet(downtown) %>%
+    #     addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+    #                 opacity = 1.0, fillOpacity = 0.5,
+    #                 highlightOptions = highlightOptions(color = "white", weight = 2,
+    #                                                     bringToFront = TRUE))
+    # })
+    
+    output$mymapPickup <- renderLeaflet({
+      nnpal <- colorNumeric(colorFactor("Spectral", NULL), domain = downtownFinal1$freq)
+      leaflet(downtownFinal1) %>%
+        addPolygons(color = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,
+                    highlightOptions = highlightOptions(color = "red", weight = 2,
+                                                        bringToFront = TRUE)) %>%
+        addLegend(pal = nnpal, values = ~freq, opacity = 1)
+    })
+    
+    output$mymapDropOff <- renderLeaflet({
+      nnpal <- colorNumeric(colorFactor("Spectral", NULL), domain = downtownFinal2$freq)
+      leaflet(downtownFinal2) %>%
+        addPolygons(color = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,
+                    highlightOptions = highlightOptions(color = "red", weight = 2,
+                                                        bringToFront = TRUE)) %>%
+        addLegend(pal = nnpal, values = ~freq, opacity = 1)
     })
     
     
