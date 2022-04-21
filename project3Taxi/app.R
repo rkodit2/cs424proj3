@@ -157,8 +157,6 @@ ui <- dashboardPage(
     #           value = "2021-08-24"
     # ),
     
-    actionButton("enter_button", "Compare Dates"),
-    actionButton("reset_bar", "Stop Compare")
     
   ),
   dashboardBody(
@@ -169,6 +167,7 @@ ui <- dashboardPage(
       fluidRow(
         column(3,
                fluidRow(
+                 box(title = "Rides in Community Area", solidHeader = TRUE, status = "primary", width = 12,
                  conditionalPanel(
                    condition = "input.ca_mode == '1'",
                    plotOutput("pickupCAPlot", height=600)
@@ -176,6 +175,7 @@ ui <- dashboardPage(
                  , conditionalPanel(
                    condition = "input.ca_mode == '2'",
                    plotOutput("dropCAPlot", height=600)
+                 )
                  )
                ),
                fluidRow(
@@ -783,7 +783,7 @@ server <- function(input, output) {
     
     output$mymapPickup <- renderLeaflet({
       nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFinal1$freq)
-      leaflet(downtownFinal1) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 11) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+      leaflet(downtownFinal1) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
         addPolygons(stroke = TRUE,
                     color = "grey",
                     fillColor = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
@@ -1036,7 +1036,7 @@ server <- function(input, output) {
     
     output$mymapDropOff <- renderLeaflet({
       nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFinal2$freq)
-      leaflet(downtownFinal2) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 11)  %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+      leaflet(downtownFinal2) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10)  %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
         addPolygons(stroke = TRUE,
                     color = "grey",
                     fillColor = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
