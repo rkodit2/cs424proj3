@@ -89,15 +89,15 @@ kmBreak <- round(1.60934*milesBreak,3)
 
 daycount <- allData3 %>% group_by(lubridateDateOnly) %>%summarise(count = n())
 hourcount <- allData3 %>% group_by(hour) %>%summarise(count = n())
-hourcount$hourAMPM <- factor(hourcount$hour, labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
-hourcount$hour <- factor(hourcount$hour, labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
+hourcount$hourAMPM <- factor(hourcount$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
+hourcount$hour <- factor(hourcount$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
 
 weekdaycount <- allData3 %>% group_by(weekday) %>%summarise(count = n())
 weekdaycount$weekday <- factor(weekdaycount$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
 monthcount <- allData3 %>% group_by(month) %>%summarise(count = n())
 monthcount$month <- factor(monthcount$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
+
 mileagecount <- allData3 %>% group_by(Trip.Miles) %>%summarise(count = n())
-# mileagecount$km <- round(conv_unit(mileagecount$Trip.Miles, "mi", "km"),3)
 mileagecount$km <- round(1.60934*mileagecount$Trip.Miles,3)
 mileagecount <- mileagecount %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
 mileagecountFinal <- mileagecount %>% mutate(km_bin = cut(km, breaks=kmBreak))
@@ -434,23 +434,227 @@ server <- function(input, output) {
       datatable(dfbar5,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
     })
     
-    # output$mymap <- renderLeaflet({
-    #   leaflet(downtown) %>%
-    #     addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-    #                 opacity = 1.0, fillOpacity = 0.5,
-    #                 highlightOptions = highlightOptions(color = "white", weight = 2,
-    #                                                     bringToFront = TRUE))
-    # })
+
     
     observe({
       click <- input$mymapPickup_shape_click
       # print(click)
       # paste("Hello")
       if (is.null(click)) return()
+      print(click$id)
+      
+
+      
+      reactivePickUp <- subset(allData3, Pickup.Community.Area == (click$id))
+      
+      reactivePickUpDayCount <- reactive({
+        #print(paste("Station name is:",stationClicked))
+        reactivePickUp %>% group_by(lubridateDateOnly) %>%summarise(count = n())
+      })
       
       
-      stationClicked = click$id
-      print(stationClicked)
+      
+      reactivePUHourCount <- reactive({
+        reactivePickUp %>% group_by(hour) %>%summarise(count = n())
+      })
+      
+      
+      
+      # reactivePUWeekdaycount <- reactive({
+      #   reactivePickUp %>% group_by(weekday) %>%summarise(count = n())
+      # })
+      
+      
+      reactivePUMonthCount <- reactive({
+        reactivePickUp %>% group_by(month) %>%summarise(count = n())
+      })
+      
+      reactivePUMileage <- reactive({
+        reactivePickUp %>% group_by(Trip.Miles) %>%summarise(count = n())
+      })
+      
+    
+    
+      
+      output$tb1 = renderDT({
+         ny1 <- reactivePickUpDayCount()
+        
+        dfbar <- data.frame(
+          date = ny1$lubridateDateOnly,
+          rides = ny1$count
+        )
+        dfbar <- dfbar[order(dfbar$date),]
+        datatable(dfbar,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb2 = renderDT({
+        # ny1 <- reactivePUHourCount()
+        ny1 <- reactivePickUp %>% group_by(hour) %>% summarise(count = n())
+        ny1$hourAMPM <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
+        
+        dfbar1 <- data.frame(
+          hours = ny1$hourAMPM,
+          rides = ny1$count
+        )
+        dfbar1 <- dfbar1[order(dfbar1$hours),]
+        datatable(dfbar1,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb2Military = renderDT({
+        # ny1 <- reactivePUHourCount()
+        ny1 <- reactivePickUp %>% group_by(hour) %>% summarise(count = n())
+        ny1$hour <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
+        
+        
+        dfbar1 <- data.frame(
+          hours = ny1$hour,
+          rides = ny1$count
+        )
+        dfbar1 <- dfbar1[order(dfbar1$hours),]
+        datatable(dfbar1,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb3 = renderDT({
+        
+        ny1 <- reactivePickUp %>% group_by(weekday) %>% summarise(count = n())
+        # ny1 <- reactivePUWeekdaycount
+        ny1$weekday <- factor(ny1$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
+      
+        
+        dfbar2 <- data.frame(
+          weekdays = ny1$weekday,
+          rides = ny1$count
+        )
+        dfbar2 <- dfbar2[order(dfbar2$weekdays),]
+        datatable(dfbar2,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb4 = renderDT({
+        ny1 <- reactivePUMonthCount()
+        ny1$month <- factor(ny1$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
+        
+        
+        dfbar3 <- data.frame(
+          months = ny1$month,
+          rides = ny1$count
+        )
+        dfbar3 <- dfbar3[order(dfbar3$months),]
+        datatable(dfbar3,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb5 = renderDT({
+        ny1 <- reactivePUMileage()
+        
+        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
+        
+        ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
+        
+        dfbar4 <- data.frame(
+          miles = ny2bin$mileage_bin,
+          rides = ny2bin$Frequency
+        )
+        dfbar4 <- dfbar4[order(dfbar4$miles),]
+        datatable(dfbar4,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tbkm = renderDT({
+        
+        ny1 <- reactivePUMileage()
+        
+        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
+      
+        
+        ny2bin <- ny2 %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
+        
+        dfbar4 <- data.frame(
+          km = ny2bin$km_bin,
+          rides = ny2bin$Frequency
+        )
+        dfbar4 <- dfbar4[order(dfbar4$km),]
+        datatable(dfbar4,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb6 = renderDT({
+        dfbar5 <- data.frame(
+          time = triptimecount1bin$trip_time_bin,
+          rides = triptimecount1bin$Frequency
+        )
+        dfbar5 <- dfbar5[order(dfbar5$time),]
+        datatable(dfbar5,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$hist1 <- renderPlot({
+        ny1 <- reactivePickUpDayCount()
+        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        
+      })
+      
+      output$hist2 <- renderPlot({
+        ny1 <- reactivePUHourCount()
+        print(ny1)
+        ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
+        
+        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$hist2Military <- renderPlot({
+        ny1 <- reactivePUHourCount()
+        ny1$hour <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23), labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
+        
+        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      
+      output$hist3 <- renderPlot({
+        # ny1 <- reactivePUWeekdaycount
+        ny1 <- reactivePickUp %>% group_by(weekday) %>% summarise(count = n())
+        
+        ny1$weekday <- factor(ny1$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
+        
+        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$hist4 <- renderPlot({
+        ny1 <- reactivePUMonthCount()
+        ny1$month <- factor(ny1$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
+        
+        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$hist5 <- renderPlot({
+        ny1 <- reactivePUMileage()
+        
+        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
+        
+        ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
+        
+        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$histkm <- renderPlot({
+        
+        ny1 <- reactivePUMileage()
+        
+        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
+        
+        
+        ny2bin <- ny2 %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
+        
+        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$hist6 <- renderPlot({
+        ggplot(triptimecount1bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
     })
     
     output$mymapPickup <- renderLeaflet({
