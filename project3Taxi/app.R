@@ -96,7 +96,11 @@ triptimecount <- allData3 %>% group_by(Trip_Seconds) %>%summarise(count = n())
 triptimecount1 <- triptimecount %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
 triptimecount1bin <- triptimecount1 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
 
+
+
 pages <- c("Home","About Page")
+
+company_names_df <- fread("Company_names.csv")
 
 
 
@@ -124,6 +128,7 @@ ui <- dashboardPage(
     # selectInput("alphabetmaxmin", h3("Order of Display"), 
     #             choices = list("Alphabetical" = 1,
     #                            "Min-Max" = 2), selected = 1),
+    selectInput("company_name", h3("Company Names"), choices = sort(company_names_df$Company), selected = "1085 - 72312 N and W Cab Co"),
     selectInput("chart1", h3("Bar/Table Theme"), 
                 choices = list("Barchart" = 1,
                                "Table" = 2), selected = 1),
@@ -133,12 +138,15 @@ ui <- dashboardPage(
     selectInput("hourmode", h3("AM-PM/24hour mode"), 
                 choices = list("AM-PM" = 1,
                                "24hour" = 2), selected = 1),
+    selectInput("view_data", h3("View Data"), 
+                choices = list("Community Area" = 1,
+                               "Taxi Company" = 2), selected = 1),
     selectInput("ca_mode", h3("PickUp/DropOff"), 
                 choices = list("PickUp(From)" = 1,
                                "DropOff(To)" = 2), selected = 1),
     actionButton("reset_bar", "Reset Graphs"),
-    hr(),
-    selectInput("page1", h3("Select the page"), pages, selected = "Home"),
+    # hr(),
+    selectInput("page1", h3("Select the page"), pages, selected = "Home")
     # hr(),
     # actionButton("prev_button","Previous Day"),
     # actionButton("next_button","Next Day"),
@@ -169,11 +177,11 @@ ui <- dashboardPage(
                fluidRow(
                  box(title = "Rides in Community Area", solidHeader = TRUE, status = "primary", width = 12,
                  conditionalPanel(
-                   condition = "input.ca_mode == '1'",
+                   condition = "input.ca_mode == '1' && input.view_data == '1'",
                    plotOutput("pickupCAPlot", height=600)
                  )
                  , conditionalPanel(
-                   condition = "input.ca_mode == '2'",
+                   condition = "input.ca_mode == '2' && input.view_data == '1'",
                    plotOutput("dropCAPlot", height=600)
                  )
                  )
@@ -181,12 +189,21 @@ ui <- dashboardPage(
                fluidRow(
                  # leafletOutput("mymap", height=900)
                  conditionalPanel(
-                   condition = "input.ca_mode == '1'",
+                   condition = "input.ca_mode == '1' && input.view_data == '1'",
                    leafletOutput("mymapPickup", height=600)
                  )
                  , conditionalPanel(
-                   condition = "input.ca_mode == '2'",
+                   condition = "input.ca_mode == '2' && input.view_data == '1'",
                    leafletOutput("mymapDropOff", height=600)
+                 ), 
+                 conditionalPanel(
+                   condition = "input.ca_mode == '2' && input.view_data == '2'",
+                   leafletOutput("mymapDropOffCompany", height=600)
+                 )
+                 ,
+                 conditionalPanel(
+                   condition = "input.ca_mode == '1' && input.view_data == '2'",
+                   leafletOutput("mymapPickUpCompany", height=600)
                  )
                )
         ),
@@ -1045,6 +1062,34 @@ server <- function(input, output) {
                                                         bringToFront = TRUE)) %>%
         addLegend(pal = nnpal, values = ~freq, opacity = 1)
     })
+    
+    
+    
+    output$mymapDropOffCompany <- renderLeaflet({
+      nnpal <- colorNumeric(colorFactor("Reds", NULL), domain = downtownFinal2$freq)
+      leaflet(downtownFinal2) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10)  %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+        addPolygons(stroke = TRUE,
+                    color = "grey",
+                    fillColor = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
+                    highlightOptions = highlightOptions(color = "red", weight = 2,
+                                                        bringToFront = TRUE)) %>%
+        addLegend(pal = nnpal, values = ~freq, opacity = 1)
+    })
+    
+    output$mymapPickUpCompany <- renderLeaflet({
+      nnpal <- colorNumeric(colorFactor("Greens", NULL), domain = downtownFinal2$freq)
+      leaflet(downtownFinal2) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10)  %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+        addPolygons(stroke = TRUE,
+                    color = "grey",
+                    fillColor = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
+                    highlightOptions = highlightOptions(color = "red", weight = 2,
+                                                        bringToFront = TRUE)) %>%
+        addLegend(pal = nnpal, values = ~freq, opacity = 1)
+    })
+    
+    
     
     
 }
