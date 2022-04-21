@@ -178,20 +178,30 @@ ui <- dashboardPage(
       # mainPanel(
       h1(textOutput("dateText")),
       fluidRow(
-        column(6,
+        column(3,
                fluidRow(
-                     # leafletOutput("mymap", height=900)
                  conditionalPanel(
                    condition = "input.ca_mode == '1'",
-                   leafletOutput("mymapPickup", height=900)
+                   plotOutput("pickupCAPlot", height=600)
                  )
                  , conditionalPanel(
                    condition = "input.ca_mode == '2'",
-                   leafletOutput("mymapDropOff", height=900)
+                   plotOutput("dropCAPlot", height=600)
+                 )
+               ),
+               fluidRow(
+                 # leafletOutput("mymap", height=900)
+                 conditionalPanel(
+                   condition = "input.ca_mode == '1'",
+                   leafletOutput("mymapPickup", height=600)
+                 )
+                 , conditionalPanel(
+                   condition = "input.ca_mode == '2'",
+                   leafletOutput("mymapDropOff", height=600)
                  )
                )
         ),
-        column(2,
+        column(3,
                fluidRow(
                  box(title = "Rides in 2019 by day of year", solidHeader = TRUE, status = "primary", width = 12,
                      conditionalPanel(
@@ -251,7 +261,7 @@ ui <- dashboardPage(
                  )
                ),
         ),
-        column(2,
+        column(4,
                fluidRow(
                    box(title = "Rides in 2019 by binned distance unit", solidHeader = TRUE, status = "primary", width = 12,
                      conditionalPanel(
@@ -344,6 +354,14 @@ server <- function(input, output) {
       ggplot(triptimecount1bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
     
+    output$pickupCAPlot <- renderPlot({
+      ggplot(pickupCAFinal, aes(x= COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+    })
+    
+    output$dropCAPlot <- renderPlot({
+      ggplot(dropCAFinal, aes(x= COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+    })
+    
     output$tb1 = renderDT({
       dfbar <- data.frame(
         date = daycount$lubridateDateOnly,
@@ -424,21 +442,48 @@ server <- function(input, output) {
     #                                                     bringToFront = TRUE))
     # })
     
+    observe({
+      click <- input$mymapPickup_shape_click
+      # print(click)
+      # paste("Hello")
+      if (is.null(click)) return()
+      
+      
+      stationClicked = click$id
+      print(stationClicked)
+    })
+    
     output$mymapPickup <- renderLeaflet({
       nnpal <- colorNumeric(colorFactor("Spectral", NULL), domain = downtownFinal1$freq)
-      leaflet(downtownFinal1) %>%
+      leaflet(downtownFinal1) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 11) %>%
         addPolygons(color = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
-                    opacity = 1.0, fillOpacity = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
                     highlightOptions = highlightOptions(color = "red", weight = 2,
                                                         bringToFront = TRUE)) %>%
         addLegend(pal = nnpal, values = ~freq, opacity = 1)
     })
     
+    
+    
+    observe({
+      click <- input$mymapDropOff_shape_click
+      # print(click)
+      # paste("Hello")
+      if (is.null(click)) return()
+      
+      
+      stationClicked = click$id
+      print(stationClicked)
+    })
+    
+    
+
+    
     output$mymapDropOff <- renderLeaflet({
       nnpal <- colorNumeric(colorFactor("Spectral", NULL), domain = downtownFinal2$freq)
-      leaflet(downtownFinal2) %>%
+      leaflet(downtownFinal2) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 11) %>%
         addPolygons(color = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
-                    opacity = 1.0, fillOpacity = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
                     highlightOptions = highlightOptions(color = "red", weight = 2,
                                                         bringToFront = TRUE)) %>%
         addLegend(pal = nnpal, values = ~freq, opacity = 1)
