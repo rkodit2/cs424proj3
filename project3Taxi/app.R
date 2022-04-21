@@ -3,6 +3,9 @@
 # the 'Run App' button above.
 #
 # Find out more about building applications with Shiny here:
+
+
+
 #
 #    http://shiny.rstudio.com/
 #
@@ -11,24 +14,14 @@ library(shiny)
 library(shinydashboard)
 library(ggplot2)
 library(lubridate)
-library(jpeg)
-library(grid)
 library(leaflet)
 library(scales)
-library(ggmap)
-library(maps)
-library(mapdata)
-library(ggthemes)
-library(sp)
-library(stringr)
-library(plyr)
 library(dplyr)
 library(DT)
-library(sf)
 library(rgdal)
+library(readr)
 
 # library(measurements)
-require(scales)
 
 
 options(scipen=999)
@@ -50,19 +43,13 @@ allDataLL3 <- do.call(rbind, allDataLL)
 downtown <- readOGR("CA/geo_export_2bbe4e78-a3d0-4e60-b4e3-8e1ceaa042d3.shp",
                     layer = "geo_export_2bbe4e78-a3d0-4e60-b4e3-8e1ceaa042d3", GDAL1_integer64_policy = TRUE)
 
-
 lubridateDate <- mdy_hms(allData3$'Trip.Start.Timestamp')
 
-allData3$lubridateDate <- lubridateDate
 allData3$month <- month(lubridateDate)
-allData3$day <- day(lubridateDate)
-allData3$year <- year(lubridateDate)
 allData3$hour <- hour(lubridateDate)
-allData3$minute <- minute(lubridateDate)
-allData3$second <- second(lubridateDate)
-allData3$weekday <- weekdays(allData3$lubridateDate)
+allData3$weekday <- wday(lubridateDate)
 
-allData3$lubridateDateOnly <- as.Date(mdy_hms(allData3$'Trip.Start.Timestamp'))
+allData3$lubridateDateOnly <- as.Date(lubridateDate)
 
 
 data1 <- read.csv("FinalCommAreas.csv")
@@ -93,7 +80,7 @@ hourcount$hourAMPM <- factor(hourcount$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11
 hourcount$hour <- factor(hourcount$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
 
 weekdaycount <- allData3 %>% group_by(weekday) %>%summarise(count = n())
-weekdaycount$weekday <- factor(weekdaycount$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
+weekdaycount$weekday <- factor(weekdaycount$weekday, levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
 monthcount <- allData3 %>% group_by(month) %>%summarise(count = n())
 monthcount$month <- factor(monthcount$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
 
@@ -642,7 +629,7 @@ server <- function(input, output) {
         
         ny1 <- reactivePickUp %>% group_by(weekday) %>% summarise(count = n())
         # ny1 <- reactivePUWeekdaycount
-        ny1$weekday <- factor(ny1$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
+        ny1$weekday <- factor(ny1$weekday,levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
       
         
         dfbar2 <- data.frame(
@@ -743,7 +730,7 @@ server <- function(input, output) {
         # ny1 <- reactivePUWeekdaycount
         ny1 <- reactivePickUp %>% group_by(weekday) %>% summarise(count = n())
         
-        ny1$weekday <- factor(ny1$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
+        ny1$weekday <- factor(ny1$weekday, levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
         
         ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
@@ -895,7 +882,7 @@ server <- function(input, output) {
         
         ny1 <- reactivePickUp %>% group_by(weekday) %>% summarise(count = n())
         # ny1 <- reactivePUWeekdaycount
-        ny1$weekday <- factor(ny1$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
+        ny1$weekday <- factor(ny1$weekday, levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
         
         
         dfbar2 <- data.frame(
@@ -996,7 +983,7 @@ server <- function(input, output) {
         # ny1 <- reactivePUWeekdaycount
         ny1 <- reactivePickUp %>% group_by(weekday) %>% summarise(count = n())
         
-        ny1$weekday <- factor(ny1$weekday, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"), labels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"))
+        ny1$weekday <- factor(ny1$weekday, levels = c(1,2,3,4,5,6,7), labels = c( "Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
         
         ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
