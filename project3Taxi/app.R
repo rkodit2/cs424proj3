@@ -20,6 +20,7 @@ library(dplyr)
 library(DT)
 library(rgdal)
 library(readr)
+library(data.table)
 
 # library(measurements)
 
@@ -27,11 +28,11 @@ library(readr)
 options(scipen=999)
 
 temp = list.files(pattern="*_1.csv")
-allData2 <- lapply(temp, read.csv)
+allData2 <- lapply(temp, fread)
 allData3 <- do.call(rbind, allData2)
-temp2 = list.files(pattern="*Company_names.csv")
-allDataLL <- lapply(temp2, read.csv)
-allDataLL3 <- do.call(rbind, allDataLL)
+# temp2 = list.files(pattern="*Company_names.csv")
+# allDataLL <- lapply(temp2, read_csv)
+# allDataLL3 <- do.call(rbind, allDataLL)
 
 # temp3 = list.files(pattern="*Areas.csv")
 # allDataCA <- lapply(temp3, read.csv)
@@ -43,24 +44,24 @@ allDataLL3 <- do.call(rbind, allDataLL)
 downtown <- readOGR("CA/geo_export_2bbe4e78-a3d0-4e60-b4e3-8e1ceaa042d3.shp",
                     layer = "geo_export_2bbe4e78-a3d0-4e60-b4e3-8e1ceaa042d3", GDAL1_integer64_policy = TRUE)
 
-lubridateDate <- mdy_hms(allData3$'Trip.Start.Timestamp')
+allData3$lubridateDate <- mdy_hms(allData3$'Trip_Start_Timestamp')
 
-allData3$month <- month(lubridateDate)
-allData3$hour <- hour(lubridateDate)
-allData3$weekday <- wday(lubridateDate)
+allData3$month <- month(allData3$lubridateDate)
+allData3$hour <- hour(allData3$lubridateDate)
+allData3$weekday <- wday(allData3$lubridateDate)
 
-allData3$lubridateDateOnly <- as.Date(lubridateDate)
-
-
-data1 <- read.csv("FinalCommAreas.csv")
-pickupCA <- allData3 %>% group_by(Pickup.Community.Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
-dropCA <- allData3 %>% group_by(Drop.off.community.Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
-pickupCAFinal <- merge(pickupCA,data1, by.x  = "Pickup.Community.Area", by.y="AREA_NUMBE")
-dropCAFinal <- merge(dropCA,data1, by.x  = "Drop.off.community.Area", by.y="AREA_NUMBE")
+allData3$lubridateDateOnly <- as.Date(allData3$lubridateDate)
 
 
-downtownFinal1 <- merge(downtown,pickupCAFinal, by.x  = "area_numbe", by.y="Pickup.Community.Area")
-downtownFinal2 <- merge(downtown,dropCAFinal, by.x  = "area_numbe", by.y="Drop.off.community.Area") 
+data1 <- fread("FinalCommAreas.csv")
+pickupCA <- allData3 %>% group_by(Pickup_Community_Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
+dropCA <- allData3 %>% group_by(Drop_off_community_Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
+pickupCAFinal <- merge(pickupCA,data1, by.x  = "Pickup_Community_Area", by.y="AREA_NUMBE")
+dropCAFinal <- merge(dropCA,data1, by.x  = "Drop_off_community_Area", by.y="AREA_NUMBE")
+
+
+downtownFinal1 <- merge(downtown,pickupCAFinal, by.x  = "area_numbe", by.y="Pickup_Community_Area")
+downtownFinal2 <- merge(downtown,dropCAFinal, by.x  = "area_numbe", by.y="Drop_off_community_Area") 
 
 
 
@@ -84,15 +85,15 @@ weekdaycount$weekday <- factor(weekdaycount$weekday, levels = c(1,2,3,4,5,6,7), 
 monthcount <- allData3 %>% group_by(month) %>%summarise(count = n())
 monthcount$month <- factor(monthcount$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
 
-mileagecount <- allData3 %>% group_by(Trip.Miles) %>%summarise(count = n())
-mileagecount$km <- round(1.60934*mileagecount$Trip.Miles,3)
-mileagecount <- mileagecount %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+mileagecount <- allData3 %>% group_by(Trip_Miles) %>%summarise(count = n())
+mileagecount$km <- round(1.60934*mileagecount$Trip_Miles,3)
+mileagecount <- mileagecount %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
 mileagecountFinal <- mileagecount %>% mutate(km_bin = cut(km, breaks=kmBreak))
 mileagecountkmbin <- mileagecountFinal %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
 mileagecountmilesbin <- mileagecountFinal %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
 
-triptimecount <- allData3 %>% group_by(Trip.Seconds) %>%summarise(count = n())
-triptimecount1 <- triptimecount %>% mutate(trip_time_bin = cut(Trip.Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
+triptimecount <- allData3 %>% group_by(Trip_Seconds) %>%summarise(count = n())
+triptimecount1 <- triptimecount %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
 triptimecount1bin <- triptimecount1 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
 
 pages <- c("Home","About Page")
@@ -552,7 +553,7 @@ server <- function(input, output) {
       
 
       
-      reactivePickUp <- subset(allData3, Pickup.Community.Area == (click$id))
+      reactivePickUp <- subset(allData3, Pickup_Community_Area == (click$id))
       
       reactivePickUpDayCount <- reactive({
         #print(paste("Station name is:",stationClicked))
@@ -577,12 +578,12 @@ server <- function(input, output) {
       })
       
       reactivePUMileage <- reactive({
-        reactivePickUp %>% group_by(Trip.Miles) %>%summarise(count = n())
+        reactivePickUp %>% group_by(Trip_Miles) %>%summarise(count = n())
       })
       
       
       reactivePUTripTime <- reactive({
-        reactivePickUp %>% group_by(Trip.Seconds) %>%summarise(count = n())
+        reactivePickUp %>% group_by(Trip_Seconds) %>%summarise(count = n())
       })
     
     
@@ -656,8 +657,8 @@ server <- function(input, output) {
       output$tb5 = renderDT({
         ny1 <- reactivePUMileage()
         
-        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
-        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
         ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
         
         ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
@@ -674,8 +675,8 @@ server <- function(input, output) {
         
         ny1 <- reactivePUMileage()
         
-        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
-        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
         ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
       
         
@@ -693,7 +694,7 @@ server <- function(input, output) {
         
         ny1 <- reactivePUTripTime()
         
-        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip.Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
+        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
         ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
         
         dfbar5 <- data.frame(
@@ -712,7 +713,7 @@ server <- function(input, output) {
       
       output$hist2 <- renderPlot({
         ny1 <- reactivePUHourCount()
-        print(ny1)
+        #print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
         ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -745,8 +746,8 @@ server <- function(input, output) {
       output$hist5 <- renderPlot({
         ny1 <- reactivePUMileage()
         
-        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
-        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
         ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
         
         ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
@@ -758,8 +759,8 @@ server <- function(input, output) {
         
         ny1 <- reactivePUMileage()
         
-        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
-        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
         ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
         
         
@@ -772,7 +773,7 @@ server <- function(input, output) {
         
         ny1 <- reactivePUTripTime()
         
-        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip.Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
+        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
         ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
         
         ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -800,12 +801,10 @@ server <- function(input, output) {
       # paste("Hello")
       if (is.null(click)) return()
       
-      
-      stationClicked = click$id
-      print(stationClicked)
+      print(click$id)
       
       
-      reactivePickUp <- subset(allData3, Drop.off.community.Area == (click$id))
+      reactivePickUp <- subset(allData3, Drop_off_community_Area == (click$id))
       
       reactivePickUpDayCount <- reactive({
         #print(paste("Station name is:",stationClicked))
@@ -830,12 +829,12 @@ server <- function(input, output) {
       })
       
       reactivePUMileage <- reactive({
-        reactivePickUp %>% group_by(Trip.Miles) %>%summarise(count = n())
+        reactivePickUp %>% group_by(Trip_Miles) %>%summarise(count = n())
       })
       
       
       reactivePUTripTime <- reactive({
-        reactivePickUp %>% group_by(Trip.Seconds) %>%summarise(count = n())
+        reactivePickUp %>% group_by(Trip_Seconds) %>%summarise(count = n())
       })
       
       
@@ -909,8 +908,8 @@ server <- function(input, output) {
       output$tb5 = renderDT({
         ny1 <- reactivePUMileage()
         
-        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
-        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
         ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
         
         ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
@@ -927,8 +926,8 @@ server <- function(input, output) {
         
         ny1 <- reactivePUMileage()
         
-        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
-        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
         ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
         
         
@@ -946,7 +945,7 @@ server <- function(input, output) {
         
         ny1 <- reactivePUTripTime()
         
-        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip.Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
+        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
         ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
         
         dfbar5 <- data.frame(
@@ -965,7 +964,7 @@ server <- function(input, output) {
       
       output$hist2 <- renderPlot({
         ny1 <- reactivePUHourCount()
-        print(ny1)
+        #print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
         ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -998,8 +997,8 @@ server <- function(input, output) {
       output$hist5 <- renderPlot({
         ny1 <- reactivePUMileage()
         
-        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
-        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
         ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
         
         ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
@@ -1011,8 +1010,8 @@ server <- function(input, output) {
         
         ny1 <- reactivePUMileage()
         
-        ny1$km <- round(1.60934*ny1$Trip.Miles,3)
-        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip.Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
         ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
         
         
@@ -1025,7 +1024,7 @@ server <- function(input, output) {
         
         ny1 <- reactivePUTripTime()
         
-        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip.Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
+        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
         ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
         
         ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
