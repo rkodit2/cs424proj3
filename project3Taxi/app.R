@@ -823,17 +823,39 @@ server <- function(input, output) {
       })
       
       
-      output$mymapPickup <- renderLeaflet({
+      # output$mymapPickup <- renderLeaflet({
+      #   nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFromTo$freq)
+      #   leaflet(downtownFromTo) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+      #     addPolygons(stroke = TRUE,
+      #                 color = "grey", fillColor = ~nnpal(freq),
+      #                 weight = 1, smoothFactor = 0.5,
+      #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
+      #                 highlightOptions = highlightOptions(color = "red", weight = 2,
+      #                                                     bringToFront = TRUE)) %>%
+      #   addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      # })
+      
+     # output$mymapPickup <- renderLeaflet({
         nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFromTo$freq)
-        leaflet(downtownFromTo) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
-          addPolygons(stroke = TRUE,
-                      color = "grey", fillColor = ~nnpal(freq),
+        leafletProxy("mymapPickup", data = downtownFromTo) %>%
+          clearControls() %>%
+          addPolygons(stroke = TRUE,  color = "grey",
+                      fillColor = ~nnpal(freq),
                       weight = 1, smoothFactor = 0.5,
-                      opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
+                      opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
                       highlightOptions = highlightOptions(color = "red", weight = 2,
                                                           bringToFront = TRUE)) %>%
         addLegend(pal = nnpal, values = ~freq, opacity = 1)
-      })
+     # })
+      
+      justonepolygon <- subset(downtownFromTo, area_numbe == click$id)
+      
+      # nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFromTo$freq)
+      # 
+      # leafletProxy("mymapPickup", data = justonepolygon) %>% addPolygons(stroke = TRUE,
+      #                         color = "red",
+      #                         weight = 1, smoothFactor = 0.5,fillColor = ~nnpal(freq),label = ~community,
+      #                         opacity = 1.0, fillOpacity = 0.5, layerId=~area_numbe)
       
       output$pickupCAPlot <- renderPlot({
         ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -841,17 +863,17 @@ server <- function(input, output) {
       
     })
     
-    # output$mymapPickup <- renderLeaflet({
-    #   nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFinal1$freq)
-    #   leaflet(downtownFinal1) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
-    #     addPolygons(stroke = TRUE,
-    #                 color = "grey",
-    #                 fillColor = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
-    #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
-    #                 highlightOptions = highlightOptions(color = "red", weight = 2,
-    #                                                     bringToFront = TRUE)) %>%
-    #     addLegend(pal = nnpal, values = ~freq, opacity = 1)
-    # })
+    output$mymapPickup <- renderLeaflet({
+      # nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFinal1$freq)
+      leaflet(downtown) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+        addPolygons(stroke = TRUE,
+                    color = "grey",
+                    weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
+                    highlightOptions = highlightOptions(color = "red", weight = 2,
+                                                        bringToFront = TRUE))
+      # addLegend(pal = nnpal, values = ~freq, opacity = 1)
+    })
   
     
     
@@ -891,17 +913,33 @@ server <- function(input, output) {
         ggplot(to_from_freq_bar, aes(x= COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#AA4A44")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
-      output$mymapDropOff <- renderLeaflet({
+      # output$mymapDropOff <- renderLeaflet({
+      #   nnpal <- colorNumeric(colorFactor("Reds", NULL), domain = downtownToFrom$freq)
+      #   leaflet(downtownToFrom) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10)  %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+      #     addPolygons(stroke = TRUE,
+      #                 color = "grey",
+      #                 fillColor = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
+      #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
+      #                 highlightOptions = highlightOptions(color = "red", weight = 2,
+      #                                                     bringToFront = TRUE)) %>%
+      #     addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      # })
+      
+      
+      #output$mymapDropOff <- renderLeaflet({
         nnpal <- colorNumeric(colorFactor("Reds", NULL), domain = downtownToFrom$freq)
-        leaflet(downtownToFrom) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10)  %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+        leafletProxy("mymapDropOff", data = downtownToFrom) %>%
+          clearControls() %>%
           addPolygons(stroke = TRUE,
                       color = "grey",
                       fillColor = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
-                      opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
+                      opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
                       highlightOptions = highlightOptions(color = "red", weight = 2,
                                                           bringToFront = TRUE)) %>%
           addLegend(pal = nnpal, values = ~freq, opacity = 1)
-      })
+      #})
+      
+
       
       
       
@@ -1137,25 +1175,15 @@ server <- function(input, output) {
     
     
     
-    output$mymapPickup <- renderLeaflet({
-      # nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFinal1$freq)
-      leaflet(downtown) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
-        addPolygons(stroke = TRUE,
-                    color = "grey",
-                    weight = 1, smoothFactor = 0.5,
-                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
-                    highlightOptions = highlightOptions(color = "red", weight = 2,
-                                                        bringToFront = TRUE))
-      # addLegend(pal = nnpal, values = ~freq, opacity = 1)
-    })
+
     
     output$mymapDropOff <- renderLeaflet({
       # nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFinal1$freq)
-      leaflet(downtown) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+      leaflet(downtown) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>%
         addPolygons(stroke = TRUE,
                     color = "grey",
                     weight = 1, smoothFactor = 0.5,
-                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
+                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe, label = ~community,
                     highlightOptions = highlightOptions(color = "red", weight = 2,
                                                         bringToFront = TRUE))
       # addLegend(pal = nnpal, values = ~freq, opacity = 1)
