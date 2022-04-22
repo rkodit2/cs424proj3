@@ -568,9 +568,12 @@ server <- function(input, output) {
       if (is.null(click)) return()
       print(click$id)
       
+      # find_company <- company_names_df[company_names_df$id == input$company_name]
+      
+
+        reactivePickUp <- subset(allData3, Pickup_Community_Area == (click$id))
 
       
-      reactivePickUp <- subset(allData3, Pickup_Community_Area == (click$id))
 
       
       
@@ -1190,6 +1193,19 @@ server <- function(input, output) {
     })
     
     
+    
+    observeEvent(input$compare_company, {
+      
+
+      
+      leafletProxy("mymap") %>%
+        # clearMarkers() %>%
+        # clearControls() %>%
+        setView(lng = median(sortedAug$Lon), lat = median(sortedAug$Lat), zoom = 10)
+      
+    })
+    
+    
 
     
 
@@ -1210,17 +1226,327 @@ server <- function(input, output) {
     
 
     
-    
-    output$mymapPickUpCompany <- renderLeaflet({
-      nnpal <- colorNumeric(colorFactor("Greens", NULL), domain = downtownFinal2$freq)
-      leaflet(downtownFinal2) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10)  %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
-        addPolygons(stroke = TRUE,
-                    color = "grey",
-                    fillColor = ~nnpal(freq), weight = 1, smoothFactor = 0.5,
-                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
+    observe({
+      click <- input$mymapPickUpCompany_shape_click
+      # print(click)
+      # paste("Hello")
+      if (is.null(click)) return()
+      print(click$id)
+      
+      find_company <- company_names_df[company_names_df$Company == input$company_name]
+      print("Reached here 1")
+      print(find_company)
+
+      co_id <- find_company$id
+      print(paste("Reached here 2", co_id))
+      reactivePickUp <- subset(allData3, Pickup_Community_Area == (click$id) & id == co_id)
+      print("Reached here 3")
+      print(reactivePickUp)
+
+      
+      
+      
+      
+      from_to_freq <- reactivePickUp %>% group_by(Drop_off_community_Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
+      print(from_to_freq)
+      q <- setdiff(1:77,from_to_freq$Drop_off_community_Area)
+      
+      if(length(q) > 0) {
+        
+        z <- c(q)
+        print(z)
+        print("Hello")
+        for (i in 1:length(z)) {
+          # from_to_freq[nrow(from_to_freq) + 1,] = c(z[i],0,0)
+          # print(z[i])
+          # print(z[[i]])
+          w <- c(z[[i]],0,0)
+          from_to_freq[nrow(from_to_freq) + 1, 1:3] <- as.list(w)
+        }
+      }
+      
+      from_to_freq_bar <- merge(from_to_freq,data1, by.x  = "Drop_off_community_Area", by.y="AREA_NUMBE")
+      #print(from_to_freq_bar)
+      
+      
+      downtownFromTo <- merge(downtown,from_to_freq, by.x  = "area_numbe", by.y="Drop_off_community_Area")
+
+      
+      reactivePickUpDayCount <- reactive({
+        #print(paste("Station name is:",stationClicked))
+        reactivePickUp %>% group_by(lubridateDateOnly) %>%summarise(count = n())
+      })
+      
+      
+      
+      reactivePUHourCount <- reactive({
+        reactivePickUp %>% group_by(hour) %>%summarise(count = n())
+      })
+      
+      
+      
+      # reactivePUWeekdaycount <- reactive({
+      #   reactivePickUp %>% group_by(weekday) %>%summarise(count = n())
+      # })
+      
+      
+      reactivePUMonthCount <- reactive({
+        reactivePickUp %>% group_by(month) %>%summarise(count = n())
+      })
+      
+      reactivePUMileage <- reactive({
+        reactivePickUp %>% group_by(Trip_Miles) %>%summarise(count = n())
+      })
+      
+      
+      reactivePUTripTime <- reactive({
+        reactivePickUp %>% group_by(Trip_Seconds) %>%summarise(count = n())
+      })
+      
+      
+      
+      
+      output$tb1 = renderDT({
+        ny1 <- reactivePickUpDayCount()
+        
+        dfbar <- data.frame(
+          date = ny1$lubridateDateOnly,
+          rides = ny1$count
+        )
+        dfbar <- dfbar[order(dfbar$date),]
+        datatable(dfbar,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb2 = renderDT({
+        # ny1 <- reactivePUHourCount()
+        ny1 <- reactivePickUp %>% group_by(hour) %>% summarise(count = n())
+        ny1$hourAMPM <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
+        
+        dfbar1 <- data.frame(
+          hours = ny1$hourAMPM,
+          rides = ny1$count
+        )
+        dfbar1 <- dfbar1[order(dfbar1$hours),]
+        datatable(dfbar1,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb2Military = renderDT({
+        # ny1 <- reactivePUHourCount()
+        ny1 <- reactivePickUp %>% group_by(hour) %>% summarise(count = n())
+        ny1$hour <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
+        
+        
+        dfbar1 <- data.frame(
+          hours = ny1$hour,
+          rides = ny1$count
+        )
+        dfbar1 <- dfbar1[order(dfbar1$hours),]
+        datatable(dfbar1,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb3 = renderDT({
+        
+        ny1 <- reactivePickUp %>% group_by(weekday) %>% summarise(count = n())
+        # ny1 <- reactivePUWeekdaycount
+        ny1$weekday <- factor(ny1$weekday,levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
+        
+        
+        dfbar2 <- data.frame(
+          weekdays = ny1$weekday,
+          rides = ny1$count
+        )
+        dfbar2 <- dfbar2[order(dfbar2$weekdays),]
+        datatable(dfbar2,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb4 = renderDT({
+        ny1 <- reactivePUMonthCount()
+        ny1$month <- factor(ny1$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
+        
+        
+        dfbar3 <- data.frame(
+          months = ny1$month,
+          rides = ny1$count
+        )
+        dfbar3 <- dfbar3[order(dfbar3$months),]
+        datatable(dfbar3,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb5 = renderDT({
+        ny1 <- reactivePUMileage()
+        
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
+        
+        ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
+        
+        dfbar4 <- data.frame(
+          miles = ny2bin$mileage_bin,
+          rides = ny2bin$Frequency
+        )
+        dfbar4 <- dfbar4[order(dfbar4$miles),]
+        datatable(dfbar4,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tbkm = renderDT({
+        
+        ny1 <- reactivePUMileage()
+        
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
+        
+        
+        ny2bin <- ny2 %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
+        
+        dfbar4 <- data.frame(
+          km = ny2bin$km_bin,
+          rides = ny2bin$Frequency
+        )
+        dfbar4 <- dfbar4[order(dfbar4$km),]
+        datatable(dfbar4,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$tb6 = renderDT({
+        
+        ny1 <- reactivePUTripTime()
+        
+        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
+        ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
+        
+        dfbar5 <- data.frame(
+          time = ny2bin$trip_time_bin,
+          rides = ny2bin$Frequency
+        )
+        dfbar5 <- dfbar5[order(dfbar5$time),]
+        datatable(dfbar5,options  = list(lengthMenu = c(13,13)), rownames= FALSE)
+      })
+      
+      output$hist1 <- renderPlot({
+        ny1 <- reactivePickUpDayCount()
+        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        
+      })
+      
+      output$hist2 <- renderPlot({
+        ny1 <- reactivePUHourCount()
+        #print(ny1)
+        ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
+        
+        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$hist2Military <- renderPlot({
+        ny1 <- reactivePUHourCount()
+        ny1$hour <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23), labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
+        
+        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      
+      output$hist3 <- renderPlot({
+        # ny1 <- reactivePUWeekdaycount
+        ny1 <- reactivePickUp %>% group_by(weekday) %>% summarise(count = n())
+        
+        ny1$weekday <- factor(ny1$weekday, levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
+        
+        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$hist4 <- renderPlot({
+        ny1 <- reactivePUMonthCount()
+        ny1$month <- factor(ny1$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
+        
+        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$hist5 <- renderPlot({
+        ny1 <- reactivePUMileage()
+        
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
+        
+        ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
+        
+        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$histkm <- renderPlot({
+        
+        ny1 <- reactivePUMileage()
+        
+        ny1$km <- round(1.60934*ny1$Trip_Miles,3)
+        ny1 <- ny1 %>% mutate(mileage_bin = cut(Trip_Miles, breaks=c(0.49, 1, 2,3,4,5,10,15,20,25,50,75,100)))
+        ny2 <- ny1 %>% mutate(km_bin = cut(km, breaks=kmBreak))
+        
+        
+        ny2bin <- ny2 %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
+        
+        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      output$hist6 <- renderPlot({
+        
+        ny1 <- reactivePUTripTime()
+        
+        ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
+        ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
+        
+        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+      
+      # output$mymapPickup <- renderLeaflet({
+      #   nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFromTo$freq)
+      #   leaflet(downtownFromTo) %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>%
+      #     addPolygons(stroke = TRUE,
+      #                 color = "grey", fillColor = ~nnpal(freq),
+      #                 weight = 1, smoothFactor = 0.5,
+      #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
+      #                 highlightOptions = highlightOptions(color = "red", weight = 2,
+      #                                                     bringToFront = TRUE)) %>%
+      #   addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      # })
+      
+      # output$mymapPickup <- renderLeaflet({
+      nnpal <- colorNumeric(colorFactor("Greens", NULL), domain = downtownFromTo$freq)
+      leafletProxy("mymapPickUpCompany", data = downtownFromTo) %>%
+        clearControls() %>%
+        addPolygons(stroke = TRUE,  color = "grey",
+                    fillColor = ~nnpal(freq),
+                    weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
                     highlightOptions = highlightOptions(color = "red", weight = 2,
                                                         bringToFront = TRUE)) %>%
         addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      # })
+      
+      justonepolygon <- subset(downtownFromTo, area_numbe == click$id)
+      
+      # nnpal <- colorNumeric(colorFactor("Blues", NULL), domain = downtownFromTo$freq)
+      # 
+      # leafletProxy("mymapPickup", data = justonepolygon) %>% addPolygons(stroke = TRUE,
+      #                         color = "red",
+      #                         weight = 1, smoothFactor = 0.5,fillColor = ~nnpal(freq),label = ~community,
+      #                         opacity = 1.0, fillOpacity = 0.5, layerId=~area_numbe)
+      
+      output$pickupCAPlot <- renderPlot({
+        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      })
+      
+    })
+    
+    
+    output$mymapPickUpCompany <- renderLeaflet({
+      leaflet(downtown) %>% addProviderTiles("CartoDB.Positron", group="bg1") %>% setView(lng = -87.623177,lat = 41.881832, zoom = 10) %>%
+        addPolygons(stroke = TRUE,
+                    color = "grey",
+                    weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe, label = ~community,
+                    highlightOptions = highlightOptions(color = "red", weight = 2,
+                                                        bringToFront = TRUE))
     })
     
     
