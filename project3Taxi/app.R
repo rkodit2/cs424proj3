@@ -327,37 +327,37 @@ ui <- dashboardPage(
 server <- function(input, output) {
 
     output$hist1 <- renderPlot({
-      ggplot(daycount, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(daycount, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Total Rides per Day")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
 
     })
 
     output$hist2 <- renderPlot({
-      ggplot(hourcount, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(hourcount, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
     
     output$hist2Military <- renderPlot({
-      ggplot(hourcount, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(hourcount, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
     
 
     output$hist3 <- renderPlot({
-      ggplot(weekdaycount, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(weekdaycount, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Weekday", title="Total rides per Weekday")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
 
     output$hist4 <- renderPlot({
-      ggplot(monthcount, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(monthcount, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Month", title="Total Rides per Month")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
 
     output$hist5 <- renderPlot({
-      ggplot(mileagecountmilesbin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(mileagecountmilesbin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Mileage Bin", title="Total Rides per Mileage Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
     
     output$histkm <- renderPlot({
-      ggplot(mileagecountkmbin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(mileagecountkmbin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Kilometer bin", title="Total Rides per KM Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
 
     output$hist6 <- renderPlot({
-      ggplot(triptimecount1bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      ggplot(triptimecount1bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Time Bin", title="Total Rides per Trip Time Bin in Seconds")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
     })
     
     # output$pickupCAPlot <- renderPlot({
@@ -463,37 +463,37 @@ server <- function(input, output) {
         })
         
         output$hist1 <- renderPlot({
-          ggplot(daycount, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+          ggplot(daycount, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Total Rides per Day")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
           
         })
         
         output$hist2 <- renderPlot({
-          ggplot(hourcount, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+          ggplot(hourcount, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         })
         
         output$hist2Military <- renderPlot({
-          ggplot(hourcount, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+          ggplot(hourcount, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         })
         
         
         output$hist3 <- renderPlot({
-          ggplot(weekdaycount, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+          ggplot(weekdaycount, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Weekday", title="Total rides per Weekday")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         })
         
         output$hist4 <- renderPlot({
-          ggplot(monthcount, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+          ggplot(monthcount, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Month", title="Total Rides per Month")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         })
         
         output$hist5 <- renderPlot({
-          ggplot(mileagecountmilesbin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+          ggplot(mileagecountmilesbin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Mileage Bin", title="Total Rides per Mileage Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         })
         
         output$histkm <- renderPlot({
-          ggplot(mileagecountkmbin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+          ggplot(mileagecountkmbin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Kilometer bin", title="Total Rides per KM Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         })
         
         output$hist6 <- renderPlot({
-          ggplot(triptimecount1bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+          ggplot(triptimecount1bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Time Bin", title="Total Rides per Trip Time Bin in Seconds")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         })
         
         # output$pickupCAPlot <- renderPlot({
@@ -823,7 +823,7 @@ server <- function(input, output) {
       
       output$hist1 <- renderPlot({
         ny1 <- reactivePickUpDayCount()
-        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Total Rides per Day")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         
       })
       
@@ -832,14 +832,14 @@ server <- function(input, output) {
         #print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
-        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist2Military <- renderPlot({
         ny1 <- reactivePUHourCount()
         ny1$hour <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23), labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
         
-        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       
@@ -849,14 +849,14 @@ server <- function(input, output) {
         
         ny1$weekday <- factor(ny1$weekday, levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
         
-        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Weekday", title="Total Rides per Weekday")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist4 <- renderPlot({
         ny1 <- reactivePUMonthCount()
         ny1$month <- factor(ny1$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
         
-        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Month", title="Total Rides per Month")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist5 <- renderPlot({
@@ -868,7 +868,7 @@ server <- function(input, output) {
         
         ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Mileage Bin", title="Total Rides per Mileage Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$histkm <- renderPlot({
@@ -882,7 +882,7 @@ server <- function(input, output) {
         
         ny2bin <- ny2 %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Kilometer Bin", title="Total Rides per KM Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist6 <- renderPlot({
@@ -892,7 +892,7 @@ server <- function(input, output) {
         ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
         ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Time Bin", title="Total Rides per Trip Time Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       
@@ -931,7 +931,7 @@ server <- function(input, output) {
       #                         opacity = 1.0, fillOpacity = 0.5, layerId=~area_numbe)
       
       output$pickupCAPlot <- renderPlot({
-        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Percentage", x="Community", title="Percentage of Rides from Community")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
     })
@@ -983,7 +983,7 @@ server <- function(input, output) {
       downtownToFrom <- merge(downtown,to_from_freq, by.x  = "area_numbe", by.y="Pickup_Community_Area")
       
       output$dropCAPlot <- renderPlot({
-        ggplot(to_from_freq_bar, aes(x= COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#AA4A44")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(to_from_freq_bar, aes(x= COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#AA4A44")+labs(y = "Percentage", x="Community", title="Percentage of Rides to Community")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       # output$mymapDropOff <- renderLeaflet({
@@ -1169,7 +1169,7 @@ server <- function(input, output) {
       
       output$hist1 <- renderPlot({
         ny1 <- reactivePickUpDayCount()
-        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Total Rides per Day")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         
       })
       
@@ -1178,14 +1178,14 @@ server <- function(input, output) {
         #print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
-        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist2Military <- renderPlot({
         ny1 <- reactivePUHourCount()
         ny1$hour <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23), labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
         
-        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       
@@ -1195,14 +1195,14 @@ server <- function(input, output) {
         
         ny1$weekday <- factor(ny1$weekday, levels = c(1,2,3,4,5,6,7), labels = c( "Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
         
-        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Weekday", title="Total Rides per Weekday")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist4 <- renderPlot({
         ny1 <- reactivePUMonthCount()
         ny1$month <- factor(ny1$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
         
-        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Month", title="Total Rides per Month")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist5 <- renderPlot({
@@ -1214,7 +1214,7 @@ server <- function(input, output) {
         
         ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Mileage Bin", title="Total Rides per Mileage Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$histkm <- renderPlot({
@@ -1228,7 +1228,7 @@ server <- function(input, output) {
         
         ny2bin <- ny2 %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Kilometer Bin", title="Total Rides per KM Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist6 <- renderPlot({
@@ -1238,7 +1238,7 @@ server <- function(input, output) {
         ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
         ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Time Bin", title="Total Rides per Trip Time Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       
@@ -1476,7 +1476,7 @@ server <- function(input, output) {
       
       output$hist1 <- renderPlot({
         ny1 <- reactivePickUpDayCount()
-        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Total Rides per Day")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         
       })
       
@@ -1485,14 +1485,14 @@ server <- function(input, output) {
         #print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
-        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist2Military <- renderPlot({
         ny1 <- reactivePUHourCount()
         ny1$hour <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23), labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
         
-        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       
@@ -1502,14 +1502,14 @@ server <- function(input, output) {
         
         ny1$weekday <- factor(ny1$weekday, levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
         
-        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Weekday", title="Total Rides per Weekday")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist4 <- renderPlot({
         ny1 <- reactivePUMonthCount()
         ny1$month <- factor(ny1$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
         
-        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Month", title="Total Rides per Month")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist5 <- renderPlot({
@@ -1521,7 +1521,7 @@ server <- function(input, output) {
         
         ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Mileage Bin", title="Total Rides per Mileage Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$histkm <- renderPlot({
@@ -1535,7 +1535,7 @@ server <- function(input, output) {
         
         ny2bin <- ny2 %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Kilometer Bin", title="Total Rides per KM Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist6 <- renderPlot({
@@ -1545,7 +1545,7 @@ server <- function(input, output) {
         ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
         ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Time Bin", title="Total Rides per Trip Time Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       
@@ -1584,7 +1584,7 @@ server <- function(input, output) {
       #                         opacity = 1.0, fillOpacity = 0.5, layerId=~area_numbe)
       
       output$pickupCAPlot <- renderPlot({
-        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Percentage", x="Community", title="Percentage of Rides from Community")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
     })
@@ -1800,7 +1800,7 @@ server <- function(input, output) {
       
       output$hist1 <- renderPlot({
         ny1 <- reactivePickUpDayCount()
-        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=lubridateDateOnly, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides in Community", x="Date", title="Total Rides per Day")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
         
       })
       
@@ -1809,14 +1809,14 @@ server <- function(input, output) {
         #print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
-        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist2Military <- renderPlot({
         ny1 <- reactivePUHourCount()
         ny1$hour <- factor(ny1$hour,levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23), labels = c("0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"))
         
-        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=hour, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       
@@ -1826,14 +1826,14 @@ server <- function(input, output) {
         
         ny1$weekday <- factor(ny1$weekday, levels = c(1,2,3,4,5,6,7), labels = c("Sun","Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"))
         
-        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=weekday, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Weekday", title="Total Rides per Weekday")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist4 <- renderPlot({
         ny1 <- reactivePUMonthCount()
         ny1$month <- factor(ny1$month, levels = c(1,2,3,4,5,6,7,8,9,10,11,12), labels = c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct", "Nov", "Dec"))
         
-        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny1, aes(x=month, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Month", title="Total Rides per Month")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist5 <- renderPlot({
@@ -1845,7 +1845,7 @@ server <- function(input, output) {
         
         ny2bin <- ny2 %>% group_by(mileage_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= mileage_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Mileage Bin", title="Total Rides per Mileage Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$histkm <- renderPlot({
@@ -1859,7 +1859,7 @@ server <- function(input, output) {
         
         ny2bin <- ny2 %>% group_by(km_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= km_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Kilometer Bin", title="Total Rides per KM Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       output$hist6 <- renderPlot({
@@ -1869,7 +1869,7 @@ server <- function(input, output) {
         ny2 <- ny1 %>% mutate(trip_time_bin = cut(Trip_Seconds, breaks=c(59,120,180,240,300,360,420,480,540,600,660,720,800,860,920,980,1020,1080,1140,1200,1260,1320,1380,1440,1500,1560,1620,1680,1740,1800,1860,1920,1980,2040,2100,2250,2500,2750,3000,3250,3500,3750,4000,5000,7500,10000,18000), dig.lab=7))
         ny2bin <- ny2 %>% group_by(trip_time_bin) %>% summarise(Frequency = sum(count))
         
-        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(ny2bin, aes(x= trip_time_bin, y=Frequency))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Time Bin", title="Total Rides per Trip Time Bin")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
       
@@ -1908,7 +1908,7 @@ server <- function(input, output) {
       #                         opacity = 1.0, fillOpacity = 0.5, layerId=~area_numbe)
       
       output$pickupCAPlot <- renderPlot({
-        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Date", title="Per date count")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Percentage", x="Community", title="Percentage of Rides from Community")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
       })
       
     })
