@@ -307,7 +307,7 @@ ui <- dashboardPage(
       condition = "input.page1 == 'About Page'",
       column(8,
              fluidRow(
-               h3("The data is from City of Chicago https://data.cityofchicago.org/Transportation/Taxi-Trips-2019/h4cq-z3dy and https://www.chicago.gov/content/dam/city/depts/doit/general/GIS/Chicago_Maps/Citywide_Maps/Community_Areas_W_Numbers.pdfand and https://en.wikipedia.org/wiki/Community_areas_in_Chicago and https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6. The web app is made by Soel Mullenkuzhiyil Sunny
+               h3("The data is from City of Chicago https://data.cityofchicago.org/Transportation/Taxi-Trips-2019/h4cq-z3dy and https://www.chicago.gov/content/dam/city/depts/doit/general/GIS/Chicago_Maps/Citywide_Maps/Community_Areas_W_Numbers.pdf and and https://en.wikipedia.org/wiki/Community_areas_in_Chicago and https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6. The web app is made by Soel Mullenkuzhiyil Sunny
                and Rajashree Kodithyala last updated on 04/23/2022 and was made to vizualize Taxi rides for Community areas in Chicago during 2019. The application shows different
                   bar charts and tables to analyze the data. There are two different modes to view data. One is for Community Areas in Chicago
                   and one is for Taxi companies. The user has the option to select which mode and depending on the mode it will display the 
@@ -316,6 +316,10 @@ ui <- dashboardPage(
                   Communites or for Taxi companies. The user can specify which Taxi company to view as well. Selecting a Community will 
                   update the original bar charts for that specific community. The map and the bar charts can be resetted back to the
                   original bar charts.")
+             ),
+             fluidRow(
+               h3("The shape file used for the map is obtained from https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6 .
+                  From here you could export it as a shape file and download it and use it.")
              )
       )
     )
