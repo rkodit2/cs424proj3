@@ -142,8 +142,8 @@ ui <- dashboardPage(
                 choices = list("Community Area" = 1,
                                "Taxi Company" = 2), selected = 1),
     selectInput("ca_mode", h3("PickUp/DropOff"), 
-                choices = list("PickUp(From)" = 1,
-                               "DropOff(To)" = 2), selected = 1),
+                choices = list("PickUp(From Community)" = 1,
+                               "DropOff(To Community)" = 2), selected = 1),
     actionButton("reset_bar", "Reset Graphs"),
     # hr(),
     selectInput("page1", h3("Select the page"), pages, selected = "Home")
@@ -586,7 +586,7 @@ server <- function(input, output) {
                         opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
                         highlightOptions = highlightOptions(color = "red", weight = 2,
                                                             bringToFront = TRUE))
-          # addLegend(pal = nnpal, values = ~freq, opacity = 1)
+          # addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
         })
         
         
@@ -599,7 +599,7 @@ server <- function(input, output) {
                         opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe, label = ~community,
                         highlightOptions = highlightOptions(color = "red", weight = 2,
                                                             bringToFront = TRUE))
-          # addLegend(pal = nnpal, values = ~freq, opacity = 1)
+          # addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
         })
         
         
@@ -633,10 +633,10 @@ server <- function(input, output) {
     
     observe({
       click <- input$mymapPickup_shape_click
-      # print(click)
+      # #print(click)
       # paste("Hello")
       if (is.null(click)) return()
-      print(click$id)
+      #print(click$id)
       
       # find_company <- company_names_df[company_names_df$id == input$company_name]
       
@@ -653,12 +653,12 @@ server <- function(input, output) {
       if(length(q) > 0) {
 
         z <- c(q)
-        print(z)
-        print("Hello")
+        #print(z)
+        #print("Hello")
         for (i in 1:length(z)) {
           # from_to_freq[nrow(from_to_freq) + 1,] = c(z[i],0,0)
-          # print(z[i])
-          # print(z[[i]])
+          # #print(z[i])
+          # #print(z[[i]])
           w <- c(z[[i]],0,0)
           from_to_freq[nrow(from_to_freq) + 1, 1:3] <- as.list(w)
         }
@@ -671,7 +671,7 @@ server <- function(input, output) {
       
       
       reactivePickUpDayCount <- reactive({
-        #print(paste("Station name is:",stationClicked))
+        ##print(paste("Station name is:",stationClicked))
         reactivePickUp %>% group_by(lubridateDateOnly) %>%summarise(count = n())
       })
       
@@ -829,7 +829,7 @@ server <- function(input, output) {
       
       output$hist2 <- renderPlot({
         ny1 <- reactivePUHourCount()
-        #print(ny1)
+        ##print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
         ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -905,7 +905,7 @@ server <- function(input, output) {
       #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
       #                 highlightOptions = highlightOptions(color = "red", weight = 2,
       #                                                     bringToFront = TRUE)) %>%
-      #   addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      #   addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
       # })
       
      # output$mymapPickup <- renderLeaflet({
@@ -918,7 +918,7 @@ server <- function(input, output) {
                       opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
                       highlightOptions = highlightOptions(color = "red", weight = 2,
                                                           bringToFront = TRUE)) %>%
-        addLegend(pal = nnpal, values = ~freq, opacity = 1)
+        addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
      # })
       
       justonepolygon <- subset(downtownFromTo, area_numbe == click$id)
@@ -945,18 +945,18 @@ server <- function(input, output) {
                     opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
                     highlightOptions = highlightOptions(color = "red", weight = 2,
                                                         bringToFront = TRUE))
-      # addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      # addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
     })
   
     
     
     observe({
       click <- input$mymapDropOff_shape_click
-      # print(click)
+      # #print(click)
       # paste("Hello")
       if (is.null(click)) return()
       
-      print(click$id)
+      #print(click$id)
       
       
       reactivePickUp <- subset(allData3, Drop_off_community_Area == (click$id))
@@ -967,12 +967,12 @@ server <- function(input, output) {
       if(length(q) > 0) {
         
         z <- c(q)
-        print(z)
-        print("Hello")
+        #print(z)
+        #print("Hello")
         for (i in 1:length(z)) {
           # from_to_freq[nrow(from_to_freq) + 1,] = c(z[i],0,0)
-          # print(z[i])
-          # print(z[[i]])
+          # #print(z[i])
+          # #print(z[[i]])
           w <- c(z[[i]],0,0)
           to_from_freq[nrow(to_from_freq) + 1, 1:3] <- as.list(w)
         }
@@ -995,7 +995,7 @@ server <- function(input, output) {
       #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
       #                 highlightOptions = highlightOptions(color = "red", weight = 2,
       #                                                     bringToFront = TRUE)) %>%
-      #     addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      #     addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
       # })
       
       
@@ -1009,7 +1009,7 @@ server <- function(input, output) {
                       opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
                       highlightOptions = highlightOptions(color = "red", weight = 2,
                                                           bringToFront = TRUE)) %>%
-          addLegend(pal = nnpal, values = ~freq, opacity = 1)
+          addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
       #})
       
 
@@ -1018,7 +1018,7 @@ server <- function(input, output) {
       
       
       reactivePickUpDayCount <- reactive({
-        #print(paste("Station name is:",stationClicked))
+        ##print(paste("Station name is:",stationClicked))
         reactivePickUp %>% group_by(lubridateDateOnly) %>%summarise(count = n())
       })
       
@@ -1175,7 +1175,7 @@ server <- function(input, output) {
       
       output$hist2 <- renderPlot({
         ny1 <- reactivePUHourCount()
-        #print(ny1)
+        ##print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
         ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -1259,7 +1259,7 @@ server <- function(input, output) {
                     opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe, label = ~community,
                     highlightOptions = highlightOptions(color = "red", weight = 2,
                                                         bringToFront = TRUE))
-      # addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      # addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
     })
 
     
@@ -1272,59 +1272,59 @@ server <- function(input, output) {
     #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
     #                 highlightOptions = highlightOptions(color = "red", weight = 2,
     #                                                     bringToFront = TRUE)) %>%
-    #     addLegend(pal = nnpal, values = ~freq, opacity = 1)
+    #     addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
     # })
     # 
 
     
     observe({
       click <- input$mymapPickUpCompany_shape_click
-      # print(click)
+      # #print(click)
       # paste("Hello")
       if (is.null(click)) return()
-      print(click$id)
+      #print(click$id)
       
       find_company <- company_names_df[company_names_df$Company == input$company_name]
-      print("Reached here 1")
-      print(find_company)
+      #print("Reached here 1")
+      #print(find_company)
 
       co_id <- find_company$id
-      print(paste("Reached here 2", co_id))
+      #print(paste("Reached here 2", co_id))
       reactivePickUp <- subset(allData3, Pickup_Community_Area == (click$id) & id == co_id)
-      print("Reached here 3")
-      print(reactivePickUp)
+      #print("Reached here 3")
+      #print(reactivePickUp)
 
       
       
       
       
       from_to_freq <- reactivePickUp %>% group_by(Drop_off_community_Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
-      print(from_to_freq)
+      #print(from_to_freq)
       q <- setdiff(1:77,from_to_freq$Drop_off_community_Area)
       
       if(length(q) > 0) {
         
         z <- c(q)
-        print(z)
-        print("Hello")
+        #print(z)
+        #print("Hello")
         for (i in 1:length(z)) {
           # from_to_freq[nrow(from_to_freq) + 1,] = c(z[i],0,0)
-          # print(z[i])
-          # print(z[[i]])
+          # #print(z[i])
+          # #print(z[[i]])
           w <- c(z[[i]],0,0)
           from_to_freq[nrow(from_to_freq) + 1, 1:3] <- as.list(w)
         }
       }
       
       from_to_freq_bar <- merge(from_to_freq,data1, by.x  = "Drop_off_community_Area", by.y="AREA_NUMBE")
-      #print(from_to_freq_bar)
+      ##print(from_to_freq_bar)
       
       
       downtownFromTo <- merge(downtown,from_to_freq, by.x  = "area_numbe", by.y="Drop_off_community_Area")
 
       
       reactivePickUpDayCount <- reactive({
-        #print(paste("Station name is:",stationClicked))
+        ##print(paste("Station name is:",stationClicked))
         reactivePickUp %>% group_by(lubridateDateOnly) %>%summarise(count = n())
       })
       
@@ -1482,7 +1482,7 @@ server <- function(input, output) {
       
       output$hist2 <- renderPlot({
         ny1 <- reactivePUHourCount()
-        #print(ny1)
+        ##print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
         ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -1558,7 +1558,7 @@ server <- function(input, output) {
       #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
       #                 highlightOptions = highlightOptions(color = "red", weight = 2,
       #                                                     bringToFront = TRUE)) %>%
-      #   addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      #   addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
       # })
       
       # output$mymapPickup <- renderLeaflet({
@@ -1571,7 +1571,7 @@ server <- function(input, output) {
                     opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
                     highlightOptions = highlightOptions(color = "red", weight = 2,
                                                         bringToFront = TRUE)) %>%
-        addLegend(pal = nnpal, values = ~freq, opacity = 1)
+        addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
       # })
       
       justonepolygon <- subset(downtownFromTo, area_numbe == click$id)
@@ -1583,9 +1583,9 @@ server <- function(input, output) {
       #                         weight = 1, smoothFactor = 0.5,fillColor = ~nnpal(freq),label = ~community,
       #                         opacity = 1.0, fillOpacity = 0.5, layerId=~area_numbe)
       
-      output$pickupCAPlot <- renderPlot({
-        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Percentage", x="Community", title="Percentage of Rides from Community")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
-      })
+      # output$pickupCAPlot <- renderPlot({
+      #   ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Percentage", x="Community", title="Percentage of Rides from Community")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      # })
       
     })
     
@@ -1606,49 +1606,49 @@ server <- function(input, output) {
       click <- input$mymapDropoffCompany_shape_click
 
       if (is.null(click)) return()
-      print(click$id)
+      #print(click$id)
       
       find_company <- company_names_df[company_names_df$Company == input$company_name]
-      print("Reached here 1")
-      print(find_company)
+      #print("Reached here 1")
+      #print(find_company)
       
       co_id <- find_company$id
-      print(paste("Reached here 2", co_id))
+      #print(paste("Reached here 2", co_id))
       reactivePickUp <- subset(allData3, Drop_off_community_Area == (click$id) & id == co_id)
-      print("Reached here 3")
-      print(reactivePickUp)
+      #print("Reached here 3")
+      #print(reactivePickUp)
       
       
       
       
       
       from_to_freq <- reactivePickUp %>% group_by(Pickup_Community_Area) %>% summarise(count = n()) %>% mutate(freq = round(count / sum(count), 4)*100)
-      print(from_to_freq)
+      #print(from_to_freq)
       q <- setdiff(1:77,from_to_freq$Pickup_Community_Area)
       
       if(length(q) > 0) {
         
         z <- c(q)
-        print(z)
-        print("Hello")
+        #print(z)
+        #print("Hello")
         for (i in 1:length(z)) {
           # from_to_freq[nrow(from_to_freq) + 1,] = c(z[i],0,0)
-          # print(z[i])
-          # print(z[[i]])
+          # #print(z[i])
+          # #print(z[[i]])
           w <- c(z[[i]],0,0)
           from_to_freq[nrow(from_to_freq) + 1, 1:3] <- as.list(w)
         }
       }
       
       from_to_freq_bar <- merge(from_to_freq,data1, by.x  = "Pickup_Community_Area", by.y="AREA_NUMBE")
-      #print(from_to_freq_bar)
+      ##print(from_to_freq_bar)
       
       
       downtownFromTo <- merge(downtown,from_to_freq, by.x  = "area_numbe", by.y="Pickup_Community_Area")
       
       
       reactivePickUpDayCount <- reactive({
-        #print(paste("Station name is:",stationClicked))
+        ##print(paste("Station name is:",stationClicked))
         reactivePickUp %>% group_by(lubridateDateOnly) %>%summarise(count = n())
       })
       
@@ -1806,7 +1806,7 @@ server <- function(input, output) {
       
       output$hist2 <- renderPlot({
         ny1 <- reactivePUHourCount()
-        #print(ny1)
+        ##print(ny1)
         ny1$hourAMPM <- factor(ny1$hour, levels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23) ,labels = c("12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"))
         
         ggplot(ny1, aes(x=hourAMPM, y=count))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Total Rides", x="Hour", title="Total Rides per Hour")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
@@ -1882,7 +1882,7 @@ server <- function(input, output) {
       #                 opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,
       #                 highlightOptions = highlightOptions(color = "red", weight = 2,
       #                                                     bringToFront = TRUE)) %>%
-      #   addLegend(pal = nnpal, values = ~freq, opacity = 1)
+      #   addLegend(pal = nnpal, values = ~freq, title = "Percentage" , opacity = 1)
       # })
       
       # output$mymapPickup <- renderLeaflet({
@@ -1893,9 +1893,9 @@ server <- function(input, output) {
                     fillColor = ~nnpal(freq),
                     weight = 1, smoothFactor = 0.5,
                     opacity = 1.0, fillOpacity = 0.5,popup = ~community, layerId=~area_numbe,label = ~community,
-                    highlightOptions = highlightOptions(color = "oranges", weight = 2,
+                    highlightOptions = highlightOptions(color = "red", weight = 2,
                                                         bringToFront = TRUE)) %>%
-        addLegend(pal = nnpal, values = ~freq, opacity = 1)
+        addLegend(pal = nnpal, values = ~freq, title = "Percentage" ,opacity = 1)
       # })
       
       justonepolygon <- subset(downtownFromTo, area_numbe == click$id)
@@ -1907,9 +1907,9 @@ server <- function(input, output) {
       #                         weight = 1, smoothFactor = 0.5,fillColor = ~nnpal(freq),label = ~community,
       #                         opacity = 1.0, fillOpacity = 0.5, layerId=~area_numbe)
       
-      output$pickupCAPlot <- renderPlot({
-        ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Percentage", x="Community", title="Percentage of Rides from Community")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
-      })
+      # output$pickupCAPlot <- renderPlot({
+      #   ggplot(from_to_freq_bar, aes(x=COMMUNITY, y=freq))+geom_bar(stat="identity", fill="#1f78b4")+labs(y = "Percentage", x="Community", title="Percentage of Rides from Community")+scale_y_continuous(labels=comma)+theme(axis.text.x = element_text(angle = 90))
+      # })
       
     })
     
